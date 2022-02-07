@@ -1,0 +1,167 @@
+import * as React from 'react';
+import style from './Landing.module.scss';
+import multistyle from './Multiple.module.scss';
+import styles from "./GlobalClaimsCenterIdForm.module.scss";
+import { ILandingProps } from './ILmLandingProps';
+import { escape, find } from "@microsoft/sp-lodash-subset";
+
+import * as $ from 'jquery';
+
+import './EditView.css';
+
+import {
+  PeoplePicker,
+  PrincipalType,
+} from "@pnp/spfx-controls-react/lib/PeoplePicker";
+import { PrimaryButton } from "office-ui-fabric-react/lib/Button";
+import { sp } from "@pnp/sp/presets/all";
+import '../../../../node_modules/bootstrap/dist/css/bootstrap.min.css';
+import '../../../../node_modules/bootstrap/dist/js/bootstrap.min.js';
+
+import TreeView from "@material-ui/lab/TreeView";
+import TreeItem from "@material-ui/lab/TreeItem";
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import ChevronRightIcon from "@material-ui/icons/ChevronRight";
+
+export default class TreeViewNav extends React.Component<any, any> {
+
+  constructor(props){
+    super(props);
+    this.state = {
+      dataColl:[],
+      treeData:[]
+    };
+  }
+
+
+  async componentDidMount(){
+    await this.getNavData("TreeViewDoc")
+  }
+
+    getNavData=async (libraryName)=>{
+    let treeData=[];
+    let obj1={text:libraryName,data:[]}
+    treeData.push(obj1);
+    await sp.web.folders.getByName(libraryName).folders.get().then(async (data)=>{  
+         for(var i1=0; i1 < data.length; i1++){
+            let obj2={text:data[i1].Name,data:[]}
+            treeData[0].data.push(obj2); 
+            debugger 
+            //console.log(data[i1].Name + " - " + data[i1].ServerRelativeUrl);
+            //let FolderURL2= libraryName+"/"+data[i1].Name
+            let FolderName2= data[i1].Name
+            //const itemColl2 = sp.web.folders.getByName(FolderURL2).folders.get().then(function(data1){
+            const ierte= await this.setSubFolder(libraryName,FolderName2,i1,treeData).then(async data1=>{
+
+            })
+            debugger       
+        }    
+        console.log(treeData)
+        this.setState({treeData:treeData})  
+        debugger        
+    }).catch(function(data){  
+    console.log(data);  
+    });
+  }
+
+   public setSubFolder=async(libraryName,FolderName2,i1,treeData)=>{
+    
+    await sp.web.folders.getByName(libraryName).folders.getByName(FolderName2).folders.get().then(async (data1)=>{
+        debugger;
+        for(var i2=0; i2 < data1.length; i2++){
+            let obj3={text:data1[i2].Name,data:[]}
+            treeData[0].data[i1].data.push(obj3);  
+            //console.log(data[i1].Name + " - " + data[i1].ServerRelativeUrl);
+            let FolderName3= data1[i2].Name
+            debugger;
+            const ierte= await this.setSubFolder2(libraryName,FolderName2,FolderName3,i1,i2,treeData)
+            debugger  
+        }           
+    })
+  }
+
+  public setSubFolder2=async(libraryName,FolderName2,FolderName3,i1,i2,treeData)=>{
+    
+    let URL="/sites/SmartekClaimsform_dev/"+libraryName+"/"+FolderName2 + "/"+FolderName3
+    await sp.web.getFolderByServerRelativeUrl(URL).files.get().then(async files => {
+        debugger;
+        for (var i = 0; i < files.length; i++) {
+            var _ServerRelativeUrl = files[i].ServerRelativeUrl;
+            let obj4={text:files[i].Name,data:[]}
+            treeData[0].data[i1].data[i2].data.push(obj4);
+            sp.web.getFileByServerRelativeUrl(_ServerRelativeUrl).getItem().then(item=> {
+                //let name=item.Name
+                
+                debugger;
+                console.log(item);
+            });
+        }
+    });
+  }
+
+  public render(): React.ReactElement<any> {
+
+    return(<div>
+        <h2>Multi Nav</h2>
+        {this.state.treeData.length > 0 && 
+            <TreeView
+                defaultCollapseIcon={<ExpandMoreIcon />}
+                defaultExpanded={["root"]}
+                defaultExpandIcon={<ChevronRightIcon />}
+                >
+                {/* {getData(this.state.treeData).map(renderTree)} */}
+                {this.state.treeData.map((item1,index1)=>{
+                    return(
+                        <TreeItem nodeId={item1.text+index1} label={item1.text}>
+                        {item1.data.length > 0 && 
+                        item1.data.map((item2,index2)=>{
+                            return(
+                                <TreeItem nodeId={item2.text+index2} label={item2.text} >
+                                
+                                {item2.data.length > 0 && 
+                                    item2.data.map((item3,index3)=>{
+                                        return(
+                                            <TreeItem nodeId={item3.text+index3} label={item3.text} >
+                                            {item3.data.length > 0 && 
+                                                item3.data.map((item4,index4)=>{
+                                                    return(
+                                                        <TreeItem nodeId={item4.text+index4} label={item4.text} >
+                                                
+                                                        </TreeItem>
+                                                    )
+                                                })             
+                                            }
+                                            </TreeItem>
+                                        )
+                                    })             
+                                }
+
+                                </TreeItem>
+                            )
+                        })             
+                        }
+                        </TreeItem>
+                    )
+                })}
+                
+                    
+            </TreeView>
+        }
+        {/* <TreeView  
+            defaultCollapseIcon={<ExpandMoreIcon />}  
+            defaultExpandIcon={<ChevronRightIcon />}  
+            >  
+            <TreeItem nodeId="1" label="Music">  
+                <TreeItem nodeId="2" label="Audio">  
+                    <TreeItem nodeId="3" label="Hindi Music" />  
+                    <TreeItem nodeId="4" label="English Music" />  
+                </TreeItem>  
+                <TreeItem nodeId="5" label="Video">  
+                    <TreeItem nodeId="6" label="Hindi Music" />  
+                    <TreeItem nodeId="7" label="English Music" />  
+                </TreeItem>  
+            </TreeItem>  
+        </TreeView> */}
+        </div>)
+  }
+}
