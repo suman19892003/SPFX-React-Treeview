@@ -4,19 +4,7 @@ import multistyle from './Multiple.module.scss';
 import styles from "./GlobalClaimsCenterIdForm.module.scss";
 import { ILandingProps } from './ILmLandingProps';
 import { escape, find } from "@microsoft/sp-lodash-subset";
-
-import * as $ from 'jquery';
-
-import './EditView.css';
-
-import {
-  PeoplePicker,
-  PrincipalType,
-} from "@pnp/spfx-controls-react/lib/PeoplePicker";
-import { PrimaryButton } from "office-ui-fabric-react/lib/Button";
 import { sp } from "@pnp/sp/presets/all";
-import '../../../../node_modules/bootstrap/dist/css/bootstrap.min.css';
-import '../../../../node_modules/bootstrap/dist/js/bootstrap.min.js';
 
 import TreeView from "@material-ui/lab/TreeView";
 import TreeItem from "@material-ui/lab/TreeItem";
