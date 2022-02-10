@@ -1,0 +1,189 @@
+import * as React from 'react';
+import style from './Landing.module.scss';
+import multistyle from './Multiple.module.scss';
+import styles from "./GlobalClaimsCenterIdForm.module.scss";
+import { ILandingProps } from './ILmLandingProps';
+import { escape, find } from "@microsoft/sp-lodash-subset";
+
+import './EditView.css';
+import { sp } from "@pnp/sp/presets/all";
+
+import TreeView from "@material-ui/lab/TreeView";
+import TreeItem from "@material-ui/lab/TreeItem";
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import ChevronRightIcon from "@material-ui/icons/ChevronRight";
+
+export default class EditViewNew extends React.Component<any, any> {
+  constructor(props){
+    super(props);
+    this.state = {
+      dataColl:[],
+      treeData:[]
+    };
+  }
+
+  componentDidMount(){
+    this.getNavData().then(itemColl=>{
+        let customDataArray:any=[]
+        console.log(JSON.stringify(this.state.dataColl))
+        this.state.dataColl.map(item=>{
+            customDataArray.push({
+                "Id":item.Id,
+                "Level1":item.Level1,
+                "Level2":item.Level2,
+                "Level3":item.Level3,
+                "Level4":item.Level4
+            })
+        })
+        //Make Unique Values
+        let uniqueLevel1 = [];
+        let uniqueLevel1Data = [];
+        let uniqueLevel2 = [];
+        let uniqueLevel2Data = [];
+        let uniqueLevel3 = [];
+        let uniqueLevel3Data = [];
+        let uniqueLevel4 = [];
+        let uniqueLevel4Data = []=customDataArray;
+        customDataArray.map(img => {
+        if (uniqueLevel1.indexOf(img.Level1) === -1) {
+            uniqueLevel1.push(img.Level1)
+            uniqueLevel1Data.push(img)
+        }
+        });
+
+        //Sort All Module
+        uniqueLevel1.sort((a, b) => (a.Level2 > b.Level2) ? 1 : -1)
+        uniqueLevel4Data.sort((a, b) => (a.Level2 > b.Level2) ? 1 : -1)
+debugger;
+        //Create Tree Structure
+        let treeData=[]
+        uniqueLevel1.map((item1,index1)=>{
+            uniqueLevel2=[];
+            //debugger
+            let obj1={text:item1,data:[]}
+            treeData.push(obj1);
+            //debugger
+            //Level 2 Code
+
+            var itemColl1=uniqueLevel4Data.filter(value => value.Level1 == item1);
+            itemColl1.map(img => {
+            debugger;
+            if (uniqueLevel2.indexOf(img.Level2) === -1) {
+                uniqueLevel2.push(img.Level2)
+            }
+            })
+            uniqueLevel2.map((item2,index2)=>{   
+                var itemColl2=uniqueLevel4Data.filter(value => value.Level1 == item1 && value.Level2==item2);
+                debugger;
+                uniqueLevel3=[];
+                itemColl2.map(img => {
+                    debugger;
+                    if (uniqueLevel3.indexOf(img.Level3) === -1) {
+                        uniqueLevel3.push(img.Level3)
+                    }
+                    })
+
+                if(itemColl2.length>0){
+                
+                    let obj2={text:item2,data:[]}
+                    treeData[index1].data.push(obj2);
+                    //Level 3 Code
+                    uniqueLevel3.map((item3,index3)=>{
+                        var itemColl3=uniqueLevel4Data.filter(value => value.Level1 == item1 && value.Level2==item2 && value.Level3==item3);
+                        debugger;
+
+                        uniqueLevel4=[];
+                        itemColl3.map(img => {
+                            debugger;
+                            if (uniqueLevel4.indexOf(img.Level4) === -1) {
+                                uniqueLevel4.push(img.Level4)
+                            }
+                            })
+
+                        if(itemColl3.length>0){
+                            let obj3={text:item3,data:[]}
+                            if(treeData[index1].data[index2]){
+                                treeData[index1].data[index2].data.push(obj3);
+                                //Level 4 Code
+                                uniqueLevel4.map((item4,index4)=>{
+                                    var itemColl4=uniqueLevel4Data.filter(value => value.Level1 == item1 && value.Level2==item2 && value.Level3==item3 && value.Level4==item4);
+                                    debugger;
+                                    if(itemColl4.length>0){
+                                    let obj4={text:item4,data:[]}
+                                        if(treeData[index1].data[index2].data[index3]){
+                                            treeData[index1].data[index2].data[index3].data.push(obj4);
+                                        }
+                                        
+                                    }
+                                })
+                            }
+                            
+                        }
+                    })
+                }
+            })
+        })
+        console.log(treeData)
+        this.setState({treeData:treeData})
+
+    })
+  }
+
+  getNavData():Promise<any>{
+    const itemColl= sp.web.lists.getByTitle('TreeViewNav').items.get().then((itemColl)=>{  
+      debugger;
+      this.setState({dataColl:itemColl});
+    })
+    return itemColl
+  }
+
+  public render(): React.ReactElement<any> {
+
+    return(<div>
+        <h2>Multi Nav</h2>
+        {this.state.treeData.length > 0 && 
+            <TreeView
+                defaultCollapseIcon={<ExpandMoreIcon />}
+                defaultExpanded={["root"]}
+                defaultExpandIcon={<ChevronRightIcon />}
+                >
+                {this.state.treeData.map((item1,index1)=>{
+                    return(
+                        <TreeItem nodeId={item1.text+index1} label={item1.text}>
+                        {item1.data.length > 0 && 
+                        item1.data.map((item2,index2)=>{
+                            return(
+                                <TreeItem nodeId={item2.text+index2} label={item2.text} >
+                                
+                                {item2.data.length > 0 && 
+                                    item2.data.map((item3,index3)=>{
+                                        return(
+                                            <TreeItem nodeId={item3.text+index3} label={item3.text} >
+                                            {item3.data.length > 0 && 
+                                                item3.data.map((item4,index4)=>{
+                                                    return(
+                                                        <TreeItem nodeId={item4.text+index4} label={item4.text} >
+                                                
+                                                        </TreeItem>
+                                                    )
+                                                })             
+                                            }
+                                            </TreeItem>
+                                        )
+                                    })             
+                                }
+
+                                </TreeItem>
+                            )
+                        })             
+                        }
+                        </TreeItem>
+                    )
+                })}
+                
+                    
+            </TreeView>
+        }
+        </div>)
+  }
+}
