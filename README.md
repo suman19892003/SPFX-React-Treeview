@@ -10,5 +10,6 @@ This solution is built to display treeview structure that fetches data from Shar
 # Library Structure
 ![image](https://user-images.githubusercontent.com/45258794/153603568-405bb155-3111-49ef-b2ff-5f44adce0989.png)
 
-![image](https://user-images.githubusercontent.com/45258794/153603745-59635144-e2d5-4b19-bde3-df670120735e.png)
+![image](https://user-images.githubusercontent.com/45258794/153604262-864d2659-6bfa-4d0c-8879-e5832a9db556.png)
+
 
