@@ -79,7 +79,7 @@ export default class TreeViewNav extends React.Component<any, any> {
             const ierte= await this.setSubFolder2(libraryName,FolderName2,FolderName3,i1,i2,treeData)
         }
     })
-    let URL="/sites/SmartekClaimsform_dev/"+libraryName+"/"+FolderName2
+    let URL="/sites/subsitename/"+libraryName+"/"+FolderName2
     await sp.web.getFolderByServerRelativeUrl(URL).files.get().then(async files => {
         for (var i = 0; i < files.length; i++) {
             var _ServerRelativeUrl = files[i].ServerRelativeUrl;
