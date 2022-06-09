@@ -13,3 +13,8 @@ This solution is built to display treeview structure that fetches data from Shar
 ![image](https://user-images.githubusercontent.com/45258794/153604767-a8e6c53c-2944-442d-aaad-732c349f7762.png)
 
 
+# Code Modification for default Treeview Open
+![image](https://user-images.githubusercontent.com/45258794/172802977-02e7acc1-e62d-4c5c-8917-bfb3ddb66e80.png)
+
+![image](https://user-images.githubusercontent.com/45258794/172803262-ad2fefa6-eefe-4ad1-9d59-b68dfda5b85d.png)
+
